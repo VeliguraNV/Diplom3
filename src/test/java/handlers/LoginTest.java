@@ -1,58 +1,44 @@
 package handlers;
 
 
+import io.qameta.allure.Step;
 import io.qameta.allure.junit4.DisplayName;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
 import org.junit.After;
 import pageobjects.LoginPage;
 import pageobjects.MainPage;
 import pageobjects.ForgotPassPage;
+import pageobjects.RegistrationPage;
 
-import java.util.concurrent.TimeUnit;
+import static handlers.WebDrivers.getWebDriver;
 
-    @RunWith(Parameterized.class)
+@RunWith(Parameterized.class)
     public class LoginTest {
         private WebDriver driver;
-        private String driverType;
+        private String browserName;
         private final static String EMAIL = "Veligura_33@gmail.com";
         private final static String PASSWORD = "12345678";
 
-        public LoginTest(String driverType) {
-            this.driverType = driverType;
-        }
-
-        @Before
-        public void startUp() {
-            if (driverType.equals("chrome")) {
-                System.setProperty("webdriver.chrome.driver", "/WebDriver/bin/chromedriver1.exe");
-                ChromeOptions options = new ChromeOptions();
-                driver = new ChromeDriver(options);
-                driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-                driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-            } else if (driverType.equals("yandex")) {
-                System.setProperty("webdriver.chrome.driver", "/WebDriver/bin/chromedriver1.exe");
-                ChromeOptions options = new ChromeOptions();
-                options.setBinary("/Users/Veliguranv/AppData/Local/Yandex/YandexBrowser/Application/browser.exe");
-                driver = new ChromeDriver(options);
-                driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-                driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-            }
-        }
-
-        @Parameterized.Parameters()
-        public static Object[][] getDataDriver() {
+    @Parameterized.Parameters(name="Browser {0}")
+        public static Object[][] initParams() {
             return new Object[][]{
                     {"chrome"},
                     {"yandex"},
             };
         }
-
+    public LoginTest(String browserName) {
+        this.browserName = browserName;
+    }
+        @Before
+        @Step("Запуск браузера")
+        public void startUp() {
+            driver = getWebDriver(browserName);
+            driver.get(Endpoints.URL_MAIN_PAGE);
+                    }
         @Test
         @DisplayName("Вход по кнопке 'Войти в аккаунт'.")
         public void enterByLoginButtonTest() {

@@ -15,40 +15,29 @@ import pageobjects.MainPage;
 
 import java.util.concurrent.TimeUnit;
 
+import static handlers.WebDrivers.getWebDriver;
+
 @RunWith(Parameterized.class)
 public class ConstructorTests {
     private WebDriver driver;
-    private String driverType;
-    private MainPage mainPage;
-
-    public ConstructorTests(String driverType) {
-        this.driverType = driverType;
-    }
-    @Before
-    public void startUp() {
-        if (driverType.equals("chrome")) {
-            System.setProperty("webdriver.chrome.driver", "/WebDriver/bin/chromedriver1.exe");
-            ChromeOptions options = new ChromeOptions();
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-            driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-        } else if (driverType.equals("yandex")) {
-            System.setProperty("webdriver.chrome.driver", "/WebDriver/bin/chromedriver1.exe");
-            ChromeOptions options = new ChromeOptions();
-            options.setBinary("/Users/Veliguranv/AppData/Local/Yandex/YandexBrowser/Application/browser.exe");
-            driver = new ChromeDriver(options);
-            driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
-            driver.navigate().to("https://stellarburgers.nomoreparties.site/");
-        }
-    }
-
-    @Parameterized.Parameters()
-    public static Object[][] getDataDriver() {
+    private String browserName;
+    @Parameterized.Parameters(name="Browser {0}")
+    public static Object[][] initParams() {
         return new Object[][]{
                 {"chrome"},
                 {"yandex"},
         };
     }
+    public ConstructorTests(String browserName){
+        this.browserName = browserName;
+    }
+    @Before
+        @Step("Запуск браузера")
+        public void startUp() {
+            driver = getWebDriver(browserName);
+            driver.get(Endpoints.URL_MAIN_PAGE);
+        }
+
     @Test
     @DisplayName("Переход в раздел 'Булки'")
     public void transitionToBunsInConstructorTest() throws InterruptedException {
